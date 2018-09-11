@@ -75,7 +75,7 @@ spec:
           env:
           args:
             - --config.file=/etc/config/alertmanager.yml
-            - --storage.path=/data
+            - --storage.path=/tmp/data
 
           ports:
             - containerPort: 9093
@@ -638,6 +638,7 @@ spec:
               memory: 250Mi
           args:
             - --config.file=/etc/config/prometheus.yml
+            - --storage.tsdb.path=/data
             - --web.console.libraries=/etc/prometheus/console_libraries
             - --web.console.templates=/etc/prometheus/consoles
             - --web.enable-lifecycle
@@ -658,6 +659,8 @@ spec:
             - name: config-volume
               mountPath: /etc/config
               readOnly: true
+            - name: data-volume
+              mountPath: /data
 
       terminationGracePeriodSeconds: 300
       volumes:
@@ -667,6 +670,8 @@ spec:
           configMap:
             name: es-monitor-api
         - name: monitor-data-volume
+          emptyDir: {}
+        - name: data-volume
           emptyDir: {}
         - name: bare-prometheus
           configMap:
@@ -1781,7 +1786,16 @@ data:
 
 ---
 # Source: enterprise-suite/templates/node-exporter.yaml
-
+# For minishift provide host acces with this
+# oc adm policy add-scc-to-user -z prometheus-node-exporter  hostaccess
+#
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: prometheus-node-exporter
 ---
 apiVersion: apps/v1beta2
 kind: DaemonSet
@@ -1803,7 +1817,7 @@ spec:
         app: prometheus
         component: node-exporter
     spec:
-      serviceAccountName: "default"
+      serviceAccountName: "prometheus-node-exporter"
       containers:
         - name: prometheus-node-exporter
           image: "prom/node-exporter:v0.15.2"
