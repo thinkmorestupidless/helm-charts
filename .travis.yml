@@ -11,21 +11,17 @@ jobs:
   include:
   - stage: Tests
     name: Validate
-    if: env(CALLER) != api
     script:
     - make lint
   - name: Minikube
-    if: env(CALLER) != api
     script:
     - scripts/setup-minikube-for-linux.sh
     - make test CHARTS=enterprise-suite
   - name: Minikube - Latest
-    if: env(CALLER) != api
     script:
     - scripts/setup-minikube-for-linux.sh
     - make test CHARTS=enterprise-suite-latest
   - name: Minikube - Frontend
-    if: env(CALLER) != api
     cache:
       directories:
         - ~/.npm
@@ -35,7 +31,6 @@ jobs:
     - scripts/setup-minikube-for-linux.sh
     - make test CHARTS=enterprise-suite ES_TEST=frontend
   - name: Minikube - Frontend (Latest)
-    if: env(CALLER) = api
     cache:
       directories:
         - ~/.npm
@@ -45,13 +40,12 @@ jobs:
     - scripts/setup-minikube-for-linux.sh
     - make test CHARTS=enterprise-suite-latest ES_TEST=frontend
   - name: Reactive-sandbox test
-    if: env(CALLER) != api
     script:
     - make test CHARTS=reactive-sandbox
   - stage: deploy
     name: Deploy to GCS
     # Only deploy for pushes to master (and if manually invoked)
-    if: (type IN (push, api)) and (env(CALLER) != api)
+    if: type IN (push, api)
     script:
     # Decrypt credentials for GCS system account helmchart@es-repo.iam.gserviceaccount.com
     - openssl aes-256-cbc -K $encrypted_f01ffbb90c44_key -iv $encrypted_f01ffbb90c44_iv -in resources/es-repo-7c1fefe17951.json.enc -out resources/es-repo-7c1fefe17951.json -d
