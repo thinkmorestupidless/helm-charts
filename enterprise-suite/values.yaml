@@ -4,7 +4,7 @@
 # lightbend-docker-registry.bintray.io/enterprise-suite/es-console
 esConsoleVersion: v0.1.1
 # lightbend-docker-registry.bintray.io/enterprise-suite/es-monitor-api
-esMonitorVersion: v0.1.0
+esMonitorVersion: david
 # lightbend-docker-registry.bintray.io/enterprise-suite/es-grafana
 esGrafanaVersion: v0.1.0
 # prom/prometheus
@@ -32,7 +32,7 @@ minikube: false
 podUID:
 # Commercial image credentials - username and password are required.
 imageCredentials:
-  registry: lightbend-docker-commercial-registry.bintray.io
+  registry: lightbend-docker-registry.bintray.io
   username: setme
   password: setme
 
